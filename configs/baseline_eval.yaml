@@ -1,0 +1,35 @@
+# S1 baseline reproduction — unmodified ProDVa on the released clean index.
+#
+# Every decoding value below is copied verbatim from the authors'
+# examples/eval.yaml @ ff2d41c. The checkpoint's generation_config.json is empty
+# (no overrides), so these are the settings that actually apply.
+# Do not change any of them: this file is the reference the poisoned runs are
+# compared against.
+
+model:
+  model_name_or_path: "/scratch/10899/kimopro/prodva_rag_poison/artifacts/upstream/checkpoint"
+  text_encoder_path: "/scratch/10899/kimopro/prodva_rag_poison/artifacts/upstream/checkpoint/text_tokenizer"
+  language_model_path: "/scratch/10899/kimopro/prodva_rag_poison/artifacts/upstream/checkpoint/lm_tokenizer"
+  phrase_encoder_path: "/scratch/10899/kimopro/prodva_rag_poison/artifacts/upstream/checkpoint/phrase_tokenizer"
+  phrase_sampler_type: "PROTEIN_FRAGMENT"
+  phrase_encoder_batch_size: 100000
+  protein_fragment_mapping_file: "/scratch/10899/kimopro/prodva_rag_poison/artifacts/upstream/dataset/phrases.json"
+
+infer:
+  doc_top_k: 16
+  embedding_model_path: "/scratch/10899/kimopro/prodva_rag_poison/artifacts/upstream/embedder"
+  vector_store_path: "/scratch/10899/kimopro/prodva_rag_poison/artifacts/upstream/dataset/index"
+  do_sample: true
+  max_new_tokens: 256
+  temperature: 0.7
+  top_k: 950
+  protein_sequence_mapping_file: "/scratch/10899/kimopro/prodva_rag_poison/artifacts/upstream/dataset/training.json"
+
+eval:
+  eval_seed: 0
+  test_data_file: "/scratch/10899/kimopro/prodva_rag_poison/artifacts/eval_subsets/test_500.json"
+  batch_size: 1
+  task_type: "PROTEIN_DESIGN"
+  # WARNING: dvagen skips generation entirely and re-reads this file if it
+  # already exists (eval.py:107-110). Use a fresh path per run.
+  save_results_path: "/scratch/10899/kimopro/prodva_rag_poison/runs/s1_baseline/results_seed0.json"

@@ -1,0 +1,48 @@
+# Pip-level pins for the prodva-poison-gen environment.
+#
+# Versions marked [pyproject] are copied verbatim from
+# third_party/ProDVa/pyproject.toml @ ff2d41c so the baseline we reproduce runs
+# on the same stack the authors specified.
+#
+# NOTE: pyproject.toml lists `faiss == 1.9.0`, which is not installable from
+# PyPI (there is no `faiss` distribution there; it is a conda-only name).
+# faiss is therefore installed by conda instead — see conda-prodva-poison-gen.yml.
+# Because of that, ProDVa must be installed with `pip install --no-deps`.
+
+torch==2.7.0                    # [pyproject]
+transformers==4.51.3            # [pyproject]
+numpy==1.26.4                   # [pyproject]
+datasets==3.6.0                 # [pyproject]
+peft==0.14.0                    # [pyproject]
+Django==5.2.1                   # [pyproject]
+langchain==0.3.25               # [pyproject]
+langchain-community==0.3.25     # [pyproject]
+langchain-core==0.3.65          # [pyproject]
+langchain-huggingface==0.3.0    # [pyproject]
+langchain-text-splitters==0.3.8 # [pyproject]
+accelerate                      # [pyproject]
+click                           # [pyproject]
+tqdm                            # [pyproject]
+spacy                           # [pyproject]
+nltk                            # [pyproject]
+typing_extensions               # [pyproject]
+pytest                          # [pyproject]
+
+# Required by dvagen.configs.parser (simple_parsing) but MISSING from pyproject.toml.
+# Without it, `dvagen eval` crashes at import.
+simple_parsing
+
+# faiss: pyproject pins `faiss==1.9.0` (conda-only name). The conda-forge faiss-GPU
+# solve exhausts memory on the only internet-capable nodes here, and the pytorch-channel
+# GPU build needs glibc>=2.32 (LS6 has 2.28). faiss-cpu gives IDENTICAL results on this
+# exact IndexFlatL2; the one GPU-transfer call is neutralized by env/shims/sitecustomize.py.
+faiss-cpu==1.9.0
+
+# Not in pyproject.toml but required at runtime:
+# langchain_huggingface.HuggingFaceEmbeddings (retriever.py:54) is a thin wrapper
+# around sentence-transformers, which is an optional extra and so never gets
+# pulled in by the pins above.
+sentence-transformers==4.1.0
+
+# Download tooling for the checkpoint and corpus.
+huggingface_hub[hf_transfer]

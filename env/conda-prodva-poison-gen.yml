@@ -1,0 +1,15 @@
+# Main environment for this project: retrieval, index building, and generation.
+# Kept deliberately separate from every other project on this machine.
+# Created by env/setup_gen_env.sh — do not `conda env update` by hand.
+name: prodva-poison-gen
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  # faiss 1.9.0 is what ProDVa's pyproject.toml pins. The GPU build is required:
+  # src/dvagen/infer/retriever.py:87-88 calls faiss.index_cpu_to_all_gpus()
+  # whenever CUDA is visible, which does not exist in the CPU-only build.
+  - faiss-gpu=1.9.0
+  - pip:
+      - -r requirements-gen.txt
